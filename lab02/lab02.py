@@ -33,8 +33,20 @@ ROMEO_SOLILOQUY = """
 ################################################################################
 # Implement this function
 def compute_ngrams(toks, n=2):
-    """Returns an n-gram dictionary based on the provided list of tokens."""
-    pass
+    output = dict()
+    for x in range(len(toks)):
+        first = toks[x]
+        second = tuple(toks[x+1:x+n])
+        
+        if len(second)<n-1:
+            return output
+            
+        if first in output:
+            output[first].append(second)
+        else:
+            output[first] = [second] #shows that it is a list
+    return output
+
 
 def test1():
     test1_1()
@@ -93,8 +105,30 @@ def test1_2():
 ################################################################################
 # Implement this function
 def gen_passage(ngram_dict, length=100):
-    pass
-
+    dictionary = sorted(ngram_dict) #the keys are being sorted and are stored there. 
+    output = []
+    answer = ""
+    #randomly pick one from dictionary
+    rando = random.choice(dictionary)
+    output.append(rando)
+    rando2 = []
+    #immediately add to output
+    while len(output) < length:
+        rando2 = random.choice(ngram_dict[(rando)])
+        # randomly pick from --> dictionary[first] --> this is how you get the list
+        output.append(rando2[0])
+        #append line to output
+        #first = line[-1]
+        rando = rando2[-1]
+        if rando in dictionary:
+            rando = rando2[-1]
+        else: 
+            rando = (random.choice(dictionary))
+            output.append((rando[0]))
+        # if first is NOT a key in the dictionary:
+            #other random selection
+    return " ".join(output) 
+    
 # 50 Points
 def test2():
     """Test case for random passage generation."""
