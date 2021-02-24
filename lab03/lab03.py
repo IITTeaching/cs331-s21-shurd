@@ -219,7 +219,6 @@ class SuffixArray():
             d = self.sArray[i]
             if self.document[d:d+len(searchstr)] == searchstr:
                 output.append(d)
-        print(output)
         return output
 
     def contains(self, searchstr: str):
