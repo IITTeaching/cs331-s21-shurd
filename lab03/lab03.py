@@ -9,6 +9,12 @@ S = TypeVar('S')
 # EXERCISE 1
 #################################################################################
 def mysort(lst: List[T], compare: Callable[[T, T], int]) -> List[T]:
+    answer = lst
+    for i in range(1, len(answer)):
+        for j in range (0,len(answer)-i):
+            if (compare(answer[j],answer[j+1])==1):
+                answer[j],answer[j+1] = answer[j+1],answer[j]
+    return answer 
     """
     This method should sort input list lst of elements of some type T.
 
@@ -17,9 +23,20 @@ def mysort(lst: List[T], compare: Callable[[T, T], int]) -> List[T]:
     right element, 1 if the left is larger than the right, and 0 if the two
     elements are equal.
     """
-    pass
 
 def mybinsearch(lst: List[T], elem: S, compare: Callable[[T, S], int]) -> int:
+    start = 0
+    end = len(lst)-1
+    while start<=end:
+        mid = (start+end)//2
+        comp = lst[mid]
+        if compare(comp, elem)==-1:
+            start = mid+1
+        elif compare(comp, elem)==1:
+            end = mid-1
+        elif compare(comp,elem)==0:
+            return mid
+    return -1
     """
     This method search for elem in lst using binary search.
 
@@ -108,22 +125,39 @@ def test1_5():
 class PrefixSearcher():
 
     def __init__(self, document, k):
+        self.doc = document
+        self.max = k
+        self.answer = []
+        x=0
+        while x<(len(self.doc)-self.max):
+            self.answer.append(self.doc[x:x+self.max:1])
+            x+=1
+        for c in range(self.max-1):
+            self.max-= 1
+            x+=1
+            self.answer.append(self.doc[x:self.max+x:1])
         """
         Initializes a prefix searcher using a document and a maximum
         search string length k.
         """
-        pass
+   
 
     def search(self, q):
+        if len(q)>len(self.doc):
+            raise Exception('q is longer than n')
+        comcmp = lambda x,y:  0 if (x[:len(q)] == y[:len(q)]) else (-1 if (x[:len(q)]<y[:len(q)]) else 1)
+        mysort(lst=self.answer, compare = comcmp)
+        answer = mybinsearch(lst=self.answer, elem =q, compare = comcmp) != -1
+        return answer
         """
         Return true if the document contains search string q (of
 
         length up to n). If q is longer than n, then raise an
         Exception.
         """
-        pass
 
 # 30 Points
+    
 def test2():
     print("#" * 80 + "\nSearch for substrings up to length n")
     test2_1()
@@ -163,20 +197,37 @@ class SuffixArray():
         """
         Creates a suffix array for document (a string).
         """
-        pass
-
+        self.document = document
+        self.suffixes = [document[i:] for i in range(len(document))]
+        comfcm = lambda x,y :0 if(x[1]==y[1]) else (-1 if (x[1]<y[1]) else 1)
+        temp = mysort(lst=list(enumerate(self.suffixes)), compare = comfcm)
+        self.sArray = [x for x, _ in temp]
+                                                                          
 
     def positions(self, searchstr: str):
         """
         Returns all the positions of searchstr in the documented indexed by the suffix array.
         """
-        pass
+        comfcm = lambda x,y :0 if self.document[x:x+len(searchstr)] == y else(-1 if (self.document[x:x+len(searchstr)]<y) else 1)
+        start = mybinsearch(lst = self.sArray, elem = searchstr, compare = comfcm)
+        
+        if start == -1:
+            return []
+        
+        output = list()
+        for i in range(start, len(self.sArray)):
+            d = self.sArray[i]
+            if self.document[d:d+len(searchstr)] == searchstr:
+                output.append(d)
+        print(output)
+        return output
 
     def contains(self, searchstr: str):
+        comcmp = lambda x,y: 0 if (self.document[x:x+len(searchstr)] == y) else (-1 if (self.document[x:x+len(searchstr)]<y) else 1) 
+        return mybinsearch(lst = self.sArray, elem = searchstr, compare = comcmp) != -1
         """
-        Returns true of searchstr is coontained in document.
+        Returns true of searchstr is contained in document.
         """
-        pass
 
 # 40 Points
 def test3():
